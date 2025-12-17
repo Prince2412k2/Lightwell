@@ -1,0 +1,6 @@
+/* .recharts border issue */
+.recharts-wrapper:focus,
+.recharts-wrapper *:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
