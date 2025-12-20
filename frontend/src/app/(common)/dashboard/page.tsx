@@ -1,20 +1,22 @@
 "use client";
 
-import GlassIcon from "@/components/GlassIcons";
-import GlassIcons from "@/components/GlassIcons";
-import { Card } from "@/components/ui/card";
-import {
-  BookAIcon,
-  CameraIcon,
-  CloudIcon,
-  DatabaseZapIcon,
-  EditIcon,
-  FileIcon,
-  HeartIcon,
-  MousePointerClickIcon,
-} from "lucide-react";
+import { CameraIcon, DatabaseZapIcon, Table } from "lucide-react";
 import { Tooltip, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import React from "react";
 export function DonutChart({
   done,
   total,
@@ -24,7 +26,7 @@ export function DonutChart({
   done: number;
   total: number;
   color: string;
-  Icon: JSXElement;
+  Icon: React.JSXElement;
 }) {
   const data = [
     { name: "done", value: done },
@@ -87,13 +89,111 @@ const ChartData = [
     color: "#FFC107",
   },
 ];
-const items = [
-  { icon: <FileIcon />, color: "blue", label: "Files" },
-  { icon: <BookAIcon />, color: "purple", label: "Books" },
-  { icon: <HeartIcon />, color: "red", label: "Health" },
-  { icon: <CloudIcon />, color: "indigo", label: "Weather" },
-  { icon: <EditIcon />, color: "orange", label: "Notes" },
+
+type Payment = {
+  id: string;
+  amount: number;
+  status: "pending" | "processing" | "success" | "failed";
+  email: string;
+};
+
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+}
+
+function DataTable<TData, TValue>({
+  columns,
+  data,
+}: DataTableProps<TData, TValue>) {
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  return (
+    <div className="overflow-hidden rounded-md border">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
+const payments: Payment[] = [
+  {
+    id: "728ed52f",
+    amount: 100,
+    status: "pending",
+    email: "m@example.com",
+  },
+  {
+    id: "489e1d42",
+    amount: 125,
+    status: "processing",
+    email: "example@gmail.com",
+  },
+  // ...
 ];
+const columns: ColumnDef<Payment>[] = [
+  {
+    accessorKey: "status",
+    header: "Status",
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+  },
+  {
+    accessorKey: "amount",
+    header: "Amount",
+  },
+];
+
+function Notifications() {
+  return <DataTable columns={columns} data={payments} />;
+}
+
 export default function page() {
   return (
     <div className="flex flex-col flex-5 gap-10">
@@ -109,19 +209,15 @@ export default function page() {
             />
             <div className="">{"storage"}</div>
           </div>
-          <div className="w-1/2">
-            {items.map((i, index) => (
-              <div key={index}>
-                <GlassIcon {...i} />
-              </div>
-            ))}
-          </div>
+          <div className="w-1/2"></div>
         </div>
         <div className=" flex flex-col justify-center w-1/3 container mx-4 mb-4 text-7xl"></div>
       </div>
 
       {/* Notifications */}
-      <div className="h-3/5 border border-green-400 container m-auto mb-10"></div>
+      <div className="h-3/5 border border-green-400 container m-auto mb-10">
+        <Notifications />
+      </div>
     </div>
   );
 }
