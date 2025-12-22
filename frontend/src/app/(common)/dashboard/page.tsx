@@ -1,22 +1,18 @@
 "use client";
 
-import { CameraIcon, DatabaseZapIcon, Table } from "lucide-react";
-import { Tooltip, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { NotificationList } from "@/components/notification-list";
+import { DatabaseZapIcon, Table } from "lucide-react";
+import {
+  Tooltip as RechartsTooltip,
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+} from "recharts";
 
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import React from "react";
+import TaskList from "@/components/tasklist";
+import { No } from "zod/v4/locales";
 export function DonutChart({
   done,
   total,
@@ -26,7 +22,7 @@ export function DonutChart({
   done: number;
   total: number;
   color: string;
-  Icon: React.JSXElement;
+  Icon: React.JSX.Element;
 }) {
   const data = [
     { name: "done", value: done },
@@ -37,7 +33,7 @@ export function DonutChart({
     <div className="flex relative w-full h-full ">
       <ResponsiveContainer className="z-10">
         <PieChart>
-          <Tooltip
+          <RechartsTooltip
             contentStyle={{
               backgroundColor: "var(--card)",
               borderRadius: "8px",
@@ -72,151 +68,32 @@ export function DonutChart({
     </div>
   );
 }
-
-const ChartData = [
-  {
-    lable: "Storage",
-    done: 135,
-    total: 500,
-    Icon: DatabaseZapIcon,
-    color: "var(--primary",
-  },
-  {
-    lable: "Active Projects",
-    done: 34,
-    total: 43,
-    Icon: CameraIcon,
-    color: "#FFC107",
-  },
-];
-
-type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
-};
-
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
-
-function DataTable<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
-  return (
-    <div className="overflow-hidden rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
-  );
-}
-
-const payments: Payment[] = [
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-  // ...
-];
-const columns: ColumnDef<Payment>[] = [
-  {
-    accessorKey: "status",
-    header: "Status",
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-  },
-  {
-    accessorKey: "amount",
-    header: "Amount",
-  },
-];
-
-function Notifications() {
-  return <DataTable columns={columns} data={payments} />;
-}
-
 export default function page() {
   return (
-    <div className="flex flex-col flex-5 gap-10">
+    <div className="h-[calc(100vh-6rem)] flex flex-col">
       {/* Charts */}
-      <div className="flex flex-3 gap-2 container m-auto mt-10">
-        <div className=" flex flex-2  w-2/3 ">
-          <div className=" flex flex-col text-center w-full  container mx-4 mb-4 ">
+      <div className="flex-[1] flex gap-4 mt-10 px-4">
+        <div className="flex w-2/3">
+          <div className="flex flex-col text-center w-full mx-4 mb-4">
             <DonutChart
               done={135}
               total={500}
               Icon={DatabaseZapIcon}
               color={"var(--primary)"}
             />
-            <div className="">{"storage"}</div>
+            <div className="mt-2 text-sm text-muted-foreground">Storage</div>
           </div>
-          <div className="w-1/2"></div>
+          <div className="w-1/2" />
         </div>
-        <div className=" flex flex-col justify-center w-1/3 container mx-4 mb-4 text-7xl"></div>
+
+        <div className="w-1/3 flex items-center justify-center text-7xl">
+          {/* Big stat */}
+        </div>
       </div>
 
       {/* Notifications */}
-      <div className="h-3/5 border border-green-400 container m-auto mb-10">
-        <Notifications />
+      <div className="px-4 pb-2 ">
+        <NotificationList />
       </div>
     </div>
   );

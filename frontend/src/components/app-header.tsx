@@ -19,7 +19,7 @@ export const AppHeader = () => {
   };
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b px-4 bg-background">
+    <header className="flex h-[3rem] shrink-0 items-center justify-between gap-2 border-b px-4 bg-background">
       <SidebarTrigger />
       <Button
         className="bg-transparent text-foreground hover:bg-transparent text-lg hover:text-xl"
